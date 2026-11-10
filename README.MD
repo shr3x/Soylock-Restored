@@ -1,9 +1,12 @@
-# **Test**
-Idk (Won't be actively maintained)
+# Soylock 
+Restoration of **Soylock**, because it was removed by SystemCallW. Now uses `uv`. Issues and PRs accepted for now but ill be barely online
 
-<p>Install:
-pip install .</p>
+## Install
+```
+pip install .
+```
 
-<p>Usage:
-uv run soylock.py <name></p>
-
+## Usage:
+```
+uv run soylock.py <name>
+```
