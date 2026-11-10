@@ -1,0 +1,24 @@
+[project]
+name = "soylock-main"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "shr3x", email = "194409493+shr3x@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "camoufox>=0.5.9",
+    "colorama>=0.4.6",
+    "pandas>=3.1.1",
+    "requests>=2.34.2",
+    "tls-client>=2.0.0",
+]
+
+[project.scripts]
+soylock-main = "soylock_main:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"

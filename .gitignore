@@ -1,6 +1,10 @@
-__pycac
 build
 dist
 soylock.egg-info
-__pycache__
 venv
+
+.venv/
+.python-version
+__pycache__/
+*.pyc
+.env
