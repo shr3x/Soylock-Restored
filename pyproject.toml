@@ -1,7 +1,7 @@
 [project]
 name = "soylock-main"
 version = "0.1.0"
-description = "Add your description here"
+description = "Soyjak.party's fork of Sherlock."
 readme = "README.md"
 authors = [
     { name = "shr3x", email = "194409493+shr3x@users.noreply.github.com" }
