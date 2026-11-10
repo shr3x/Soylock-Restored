@@ -1,0 +1,6 @@
+__pycac
+build
+dist
+soylock.egg-info
+__pycache__
+venv
