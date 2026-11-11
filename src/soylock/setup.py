@@ -21,7 +21,6 @@ PLATFORM_CONFIGS = {
         "os_slug": "win",
         "arch": "x86_64",
     },
-
     # ── Linux (official) ────────────────────────────────────────────────────
     "linux-x86_64": {
         "owner": "daijro",
@@ -39,7 +38,6 @@ PLATFORM_CONFIGS = {
         "os_slug": "lin",
         "arch": "arm64",
     },
-
     # ── macOS (official) ────────────────────────────────────────────────────
     "darwin-x86_64": {
         "owner": "daijro",
@@ -61,6 +59,7 @@ PLATFORM_CONFIGS = {
 
 DEFAULT_TEMPLATE = "camoufox-{asset_version}-{os_slug}.{arch}.zip"
 
+
 def get_platform_key() -> str:
     """Return a key like 'windows-x86_64', 'linux-arm64', 'darwin-x86_64'."""
     system = platform.system().lower()
@@ -77,6 +76,7 @@ def get_platform_key() -> str:
 
     return f"{system}-{arch}"
 
+
 def get_platform_config() -> dict:
     """Resolve the configuration for the current platform."""
     key = get_platform_key()
@@ -85,13 +85,16 @@ def get_platform_config() -> dict:
         system = platform.system().lower()
         for k, v in PLATFORM_CONFIGS.items():
             if k.startswith(f"{system}-"):
-                print(f"[setup] Warning: exact platform '{key}' not found. Using closest match '{k}'.")
+                print(
+                    f"[setup] Warning: exact platform '{key}' not found. Using closest match '{k}'."
+                )
                 return v
         raise RuntimeError(
             f"No PLATFORM_CONFIGS entry for platform '{key}'.\n"
             f"Available keys: {list(PLATFORM_CONFIGS.keys())}"
         )
     return cfg
+
 
 def get_asset_name(cfg: dict) -> str:
     """Build the asset filename from config, using exact override or template."""
@@ -104,6 +107,7 @@ def get_asset_name(cfg: dict) -> str:
         arch=cfg["arch"],
     )
 
+
 def get_download_url(cfg: dict) -> str:
     """Build the full GitHub release asset download URL."""
     owner = cfg["owner"]
@@ -112,9 +116,11 @@ def get_download_url(cfg: dict) -> str:
     asset = get_asset_name(cfg)
     return f"https://github.com/{owner}/{repo}/releases/download/{tag}/{asset}"
 
+
 def _get_expected_exe_name() -> str:
     """Return the expected executable name for the current OS."""
     return "camoufox.exe" if platform.system().lower() == "windows" else "camoufox"
+
 
 def is_browser_installed(dist_path: Path) -> bool:
     """
@@ -138,6 +144,7 @@ def is_browser_installed(dist_path: Path) -> bool:
 
     return True
 
+
 def find_executable(dist_path: Path) -> Path | None:
     """Locate the Camoufox executable inside the dist folder."""
     exe_name = _get_expected_exe_name()
@@ -152,6 +159,7 @@ def find_executable(dist_path: Path) -> Path | None:
             if candidate.exists():
                 return candidate
     return None
+
 
 def download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
     """Download a file with a simple progress indicator."""
@@ -171,7 +179,9 @@ def download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
                     downloaded += len(chunk)
                     if total > 0:
                         pct = downloaded * 100 // total
-                        sys.stdout.write(f"\r[setup] {pct}% ({downloaded:,} / {total:,} bytes)")
+                        sys.stdout.write(
+                            f"\r[setup] {pct}% ({downloaded:,} / {total:,} bytes)"
+                        )
                         sys.stdout.flush()
             print("\n[setup] Download complete.")
     except urllib.error.HTTPError as e:
@@ -182,6 +192,7 @@ def download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
             ) from e
         raise
 
+
 def extract_zip(archive_path: Path, dest_dir: Path) -> None:
     """Extract a .zip archive into the destination directory."""
     print(f"[setup] Extracting {archive_path.name} ...")
@@ -190,11 +201,13 @@ def extract_zip(archive_path: Path, dest_dir: Path) -> None:
         zf.extractall(dest_dir)
     print(f"[setup] Extracted to {dest_dir}")
 
+
 def make_executable(file_path: Path) -> None:
     """Ensure the binary has executable permissions on Unix."""
     if platform.system() != "Windows" and file_path.exists():
         st = os.stat(file_path)
         os.chmod(file_path, st.st_mode | stat.S_IEXEC)
+
 
 def hoist_nested_bundle(dist_path: Path) -> None:
     """
@@ -214,6 +227,7 @@ def hoist_nested_bundle(dist_path: Path) -> None:
                     dest.unlink()
             shutil.move(str(item), str(dest))
         nested.rmdir()
+
 
 def fetch_browser(dist_path: Path | None = None) -> Path:
     """
@@ -263,6 +277,7 @@ def fetch_browser(dist_path: Path | None = None) -> Path:
 
     return dist_path
 
+
 def get_dist_path(dist_path: Path | None = None) -> Path:
     """
     Return the resolved dist/ directory path.
@@ -271,6 +286,7 @@ def get_dist_path(dist_path: Path | None = None) -> Path:
     if dist_path is None:
         return DIST_DIR.resolve()
     return Path(dist_path).resolve()
+
 
 def get_browser_path(
     dist_path: Path | None = None,
@@ -320,6 +336,7 @@ def get_browser_path(
 
     return exe.resolve()
 
+
 if __name__ == "__main__":
     from setuptools import setup, find_packages
     from setuptools.command.install import install
@@ -327,23 +344,27 @@ if __name__ == "__main__":
 
     class InstallCommand(install):
         """Runs the browser fetch before the normal install."""
+
         def run(self):
             fetch_browser()
             super().run()
 
     class DevelopCommand(develop):
         """Runs the browser fetch before the normal develop (editable install)."""
+
         def run(self):
             fetch_browser()
             super().run()
 
     def _cli_main():
         import argparse
+
         parser = argparse.ArgumentParser(description="Camoufox browser setup helper")
         parser.add_argument(
-            "--dist-dir", "-d",
+            "--dist-dir",
+            "-d",
             default=str(DIST_DIR),
-            help=f"Directory to install the browser (default: {DIST_DIR})"
+            help=f"Directory to install the browser (default: {DIST_DIR})",
         )
         args = parser.parse_args()
 

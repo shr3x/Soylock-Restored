@@ -2,6 +2,7 @@
 
 This module defines various objects for recording the results of queries.
 """
+
 from enum import Enum
 
 
@@ -10,13 +11,14 @@ class QueryStatus(Enum):
 
     Describes status of query about a given username.
     """
-    CLAIMED       = "Claimed"       # Username Detected
-    AVAILABLE     = "Available"     # Username Not Detected
-    UNKNOWN       = "Unknown"       # Error Occurred While Trying To Detect Username
-    ILLEGAL       = "Illegal"       # Username Not Allowable For This Site
-    WAF           = "WAF"           # Request blocked by WAF (i.e. Cloudflare)
-    UNIMPLEMENTED = "Unimplemented" # This site requires unimplemented method
-    BLOCKED       = "Blocked"       # Request blocked by country
+
+    CLAIMED = "Claimed"  # Username Detected
+    AVAILABLE = "Available"  # Username Not Detected
+    UNKNOWN = "Unknown"  # Error Occurred While Trying To Detect Username
+    ILLEGAL = "Illegal"  # Username Not Allowable For This Site
+    WAF = "WAF"  # Request blocked by WAF (i.e. Cloudflare)
+    UNIMPLEMENTED = "Unimplemented"  # This site requires unimplemented method
+    BLOCKED = "Blocked"  # Request blocked by country
 
     def __str__(self):
         """Convert Object To String.
@@ -29,13 +31,23 @@ class QueryStatus(Enum):
         """
         return self.value
 
-class QueryResult():
+
+class QueryResult:
     """Query Result Object.
 
     Describes result of query about a given username.
     """
-    def __init__(self, username, site_name, site_url_user, status,
-                 query_time=None, context=None, fields=None):
+
+    def __init__(
+        self,
+        username,
+        site_name,
+        site_url_user,
+        status,
+        query_time=None,
+        context=None,
+        fields=None,
+    ):
         """Create Query Result Object.
 
         Contains information about a specific method of detecting usernames on
@@ -64,13 +76,13 @@ class QueryResult():
         Nothing.
         """
 
-        self.username      = username
-        self.site_name     = site_name
+        self.username = username
+        self.site_name = site_name
         self.site_url_user = site_url_user
-        self.status        = status
-        self.query_time    = query_time
-        self.context       = context
-        self.fields        = fields
+        self.status = status
+        self.query_time = query_time
+        self.context = context
+        self.fields = fields
 
         return
 

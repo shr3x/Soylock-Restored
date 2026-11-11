@@ -15,8 +15,11 @@ if __name__ == "__main__":
     python_version = sys.version.split()[0]
 
     if sys.version_info < (3, 9):
-        print(f"Soylock requires Python 3.9+\nYou are using Python {python_version}, which is not supported by Soylock.")
+        print(
+            f"Soylock requires Python 3.9+\nYou are using Python {python_version}, which is not supported by Soylock."
+        )
         sys.exit(1)
 
     from soylock_project import soylock
+
     soylock.main()

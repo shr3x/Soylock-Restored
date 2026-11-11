@@ -16,9 +16,11 @@ from .helper import (
     click_cf_checkbox,
 )
 
+
 @dataclass
 class BrowserResponse:
     """Drop-in replacement for requests.Response in the Soylock flow."""
+
     status_code: int
     text: str
     elapsed: timedelta = field(default_factory=lambda: timedelta(seconds=0))
@@ -30,10 +32,10 @@ class BrowserResponse:
 class BrowserEngine:
     """
     Pool-based tab engine using context-level page events.
-    
+
     Anchor starts on a real origin to reliably spawn tabs, then navigates
     to about:blank. All pool tabs are empty (about:blank) and ready for use.
-    
+
     Captcha behaviour:
         - A single asyncio.Lock ensures only one tab solves a challenge at a time.
         - When a tab sees a challenge it acquires the lock, solves it, then releases it.
@@ -41,7 +43,9 @@ class BrowserEngine:
           simply wait on the semaphore as usual.
     """
 
-    def __init__(self, max_workers: int = 20, headless: bool = True, proxy: Optional[str] = None):
+    def __init__(
+        self, max_workers: int = 20, headless: bool = True, proxy: Optional[str] = None
+    ):
         self.max_workers = max_workers
         self.headless = headless
         self.proxy = proxy
@@ -51,7 +55,7 @@ class BrowserEngine:
         self.anchor = None
         self._page_pool = asyncio.Queue()
         self._semaphore = asyncio.Semaphore(max_workers)
-        self._captcha_lock = asyncio.Lock()   # ← global captcha serializer
+        self._captcha_lock = asyncio.Lock()  # ← global captcha serializer
         self._started = False
 
     async def start(self):
@@ -59,24 +63,24 @@ class BrowserEngine:
             return
 
         camoufox_config = {
-            'headless': self.headless,
-            'humanize': True,
-            'main_world_eval': True,
-            'i_know_what_im_doing': True,
-            'config': {'forceScopeAccess': True},
-            'disable_coop': True,
-            'executable_path': get_browser_path(auto_fetch=True),
-            'ff_version': 150,
-            'firefox_user_prefs': {
-                'browser.link.open_newwindow': 3,
-                'browser.link.open_newwindow.restriction': 0,
-                'browser.tabs.loadInBackground': True,
-                'dom.disable_open_during_load': False,
-                'privacy.popups.disable_popup_from_plugins': False,
-            }
+            "headless": self.headless,
+            "humanize": True,
+            "main_world_eval": True,
+            "i_know_what_im_doing": True,
+            "config": {"forceScopeAccess": True},
+            "disable_coop": True,
+            "executable_path": get_browser_path(auto_fetch=True),
+            "ff_version": 150,
+            "firefox_user_prefs": {
+                "browser.link.open_newwindow": 3,
+                "browser.link.open_newwindow.restriction": 0,
+                "browser.tabs.loadInBackground": True,
+                "dom.disable_open_during_load": False,
+                "privacy.popups.disable_popup_from_plugins": False,
+            },
         }
         if self.proxy:
-            camoufox_config['proxy'] = {'server': self.proxy}
+            camoufox_config["proxy"] = {"server": self.proxy}
 
         self._camoufox = AsyncCamoufox(**camoufox_config)
         self.browser = await self._camoufox.__aenter__()
@@ -92,13 +96,15 @@ class BrowserEngine:
         for i in range(self.max_workers):
             page = await self._create_empty_tab()
             if page is None:
-                print(f"Failed to create tab {i+1}, pool size will be smaller")
+                print(f"Failed to create tab {i + 1}, pool size will be smaller")
                 break
             await self._page_pool.put(page)
 
         # NOW navigate anchor to about:blank — tabs are already created
         try:
-            await self.anchor.goto("about:blank", wait_until="domcontentloaded", timeout=5000)
+            await self.anchor.goto(
+                "about:blank", wait_until="domcontentloaded", timeout=5000
+            )
         except Exception:
             pass
 
@@ -130,8 +136,7 @@ class BrowserEngine:
         # Wait for new page via context event
         try:
             new_page = await asyncio.wait_for(
-                self.context.wait_for_event('page'),
-                timeout=10.0
+                self.context.wait_for_event("page"), timeout=10.0
             )
         except asyncio.TimeoutError:
             await asyncio.sleep(0.3)
@@ -191,13 +196,13 @@ class BrowserEngine:
         json: Optional[Any] = None,
         timeout: int = 60,
         allow_redirects: bool = True,
-        **kwargs
+        **kwargs,
     ) -> BrowserResponse:
         """
         Execute a request using a pooled tab.
         GET with allow_redirects=True uses full navigation.
         All other methods use Playwright's APIRequestContext.
-        
+
         Captcha solving is globally serialized via _captcha_lock so that
         only one tab attempts to solve a challenge at any given moment.
         """
@@ -206,8 +211,7 @@ class BrowserEngine:
             start_time = time.monotonic()
 
             filtered_headers = {
-                k: v for k, v in (headers or {}).items()
-                if k.lower() != 'user-agent'
+                k: v for k, v in (headers or {}).items() if k.lower() != "user-agent"
             }
 
             try:
@@ -262,7 +266,9 @@ class BrowserEngine:
                             async with self._captcha_lock:
                                 solved = await click_cf_checkbox(page)
                                 if not solved:
-                                    print(f"Warning: Could not solve challenge for {url}")
+                                    print(
+                                        f"Warning: Could not solve challenge for {url}"
+                                    )
                                 await asyncio.sleep(1)
                     except:
                         pass
@@ -281,7 +287,9 @@ class BrowserEngine:
                             req_kwargs["data"] = json
                         response = await request_context.put(url, **req_kwargs)
                     else:
-                        raise RuntimeError(f"Unsupported HTTP method for browser engine: {method}")
+                        raise RuntimeError(
+                            f"Unsupported HTTP method for browser engine: {method}"
+                        )
 
                     elapsed = timedelta(seconds=time.monotonic() - start_time)
                     text = await response.text()
@@ -296,14 +304,19 @@ class BrowserEngine:
 
             except PlaywrightError as e:
                 elapsed = timedelta(seconds=time.monotonic() - start_time)
-                return BrowserResponse(status_code=0, text=str(e), elapsed=elapsed, url=url)
+                return BrowserResponse(
+                    status_code=0, text=str(e), elapsed=elapsed, url=url
+                )
             except Exception as e:
                 elapsed = timedelta(seconds=time.monotonic() - start_time)
-                return BrowserResponse(status_code=0, text=str(e), elapsed=elapsed, url=url)
+                return BrowserResponse(
+                    status_code=0, text=str(e), elapsed=elapsed, url=url
+                )
             finally:
                 if not page.is_closed():
                     await self._safe_reset(page)
                     await self._page_pool.put(page)
+
 
 class BrowserSession:
     """

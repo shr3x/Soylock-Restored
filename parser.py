@@ -8,8 +8,8 @@ from bs4 import BeautifulSoup, Tag
 JSONScalar = Union[str, int, float, bool, None]
 JSONValue = Union[JSONScalar, Dict[str, Any], List[Any]]
 
-class Parser:
 
+class Parser:
     HTML_FIELD_ATTRS = (
         "data-e2e",
         "data-field",
@@ -26,7 +26,13 @@ class Parser:
         self.raw = html_blob
         self.soup = BeautifulSoup(html_blob, parser)
 
-    def find(self, field_name: str, strategy: str = "auto", html_attr: Optional[str] = None, as_dict: bool = False) -> Optional[JSONValue]:
+    def find(
+        self,
+        field_name: str,
+        strategy: str = "auto",
+        html_attr: Optional[str] = None,
+        as_dict: bool = False,
+    ) -> Optional[JSONValue]:
         if as_dict:
             if strategy in ("auto", "json"):
                 return self.extract_json_container(field_name)
@@ -44,7 +50,12 @@ class Parser:
 
         return None
 
-    def find_all(self, field_name: Union[str, List[str]], strategy: str = "auto", html_attr: Optional[str] = None) -> List[JSONValue]:
+    def find_all(
+        self,
+        field_name: Union[str, List[str]],
+        strategy: str = "auto",
+        html_attr: Optional[str] = None,
+    ) -> List[JSONValue]:
         if isinstance(field_name, (list, tuple)):
             if strategy in ("auto", "json"):
                 return self.extract_all_json_records(list(field_name))
@@ -83,7 +94,9 @@ class Parser:
 
         return None
 
-    def extract_all_json_records(self, field_names: List[str]) -> List[Dict[str, JSONValue]]:
+    def extract_all_json_records(
+        self, field_names: List[str]
+    ) -> List[Dict[str, JSONValue]]:
         field_names = [str(field_name) for field_name in field_names]
         if not field_names:
             return []
@@ -98,7 +111,9 @@ class Parser:
 
         return self.extract_all_json_records_by_scan(field_names)
 
-    def extract_all_json_records_by_scan(self, field_names: List[str]) -> List[Dict[str, JSONValue]]:
+    def extract_all_json_records_by_scan(
+        self, field_names: List[str]
+    ) -> List[Dict[str, JSONValue]]:
         rows = []
 
         for obj_text in self.iter_leaf_json_object_texts():
@@ -116,7 +131,9 @@ class Parser:
         return rows
 
     @classmethod
-    def collect_json_records(cls, value, field_names: List[str], rows: List[Dict[str, JSONValue]]) -> None:
+    def collect_json_records(
+        cls, value, field_names: List[str], rows: List[Dict[str, JSONValue]]
+    ) -> None:
         if isinstance(value, dict):
             row = {
                 field_name: value[field_name]
@@ -170,7 +187,7 @@ class Parser:
                     return None
                 stack.pop()
                 if not stack:
-                    return self.raw[start:i + 1]
+                    return self.raw[start : i + 1]
 
         return None
 
@@ -204,7 +221,7 @@ class Parser:
                         return None
                     stack.pop()
                     if not stack:
-                        return self.raw[start:i + 1]
+                        return self.raw[start : i + 1]
 
             i += 1
 
@@ -258,7 +275,9 @@ class Parser:
             # 'field': 'value' or 'field': "value"
             (
                 re.compile(
-                    r"'{}'\s*:\s*(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[A-Za-z0-9_+\-.eE]+)".format(esc)
+                    r"'{}'\s*:\s*(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[A-Za-z0-9_+\-.eE]+)".format(
+                        esc
+                    )
                 ),
                 None,
             ),
@@ -311,7 +330,7 @@ class Parser:
 
         while i < len(self.raw):
             if self.raw[i] == "\\" and i + 1 < len(self.raw):
-                if self.raw[i:i + 2] == end_seq:
+                if self.raw[i : i + 2] == end_seq:
                     return "".join(chars)
 
                 chars.append(self.decode_escape(self.raw[i + 1]))
@@ -339,22 +358,20 @@ class Parser:
         if raw.startswith('"') and raw.endswith('"'):
             inner = raw[1:-1]
             return (
-                inner
-                .replace('\\"', '"')
-                .replace('\\\\', '\\')
-                .replace('\\n', '\n')
-                .replace('\\t', '\t')
-                .replace('\\/', '/')
+                inner.replace('\\"', '"')
+                .replace("\\\\", "\\")
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
+                .replace("\\/", "/")
             )
 
         if raw.startswith("'") and raw.endswith("'"):
             inner = raw[1:-1]
             return (
-                inner
-                .replace("\\'", "'")
-                .replace('\\\\', '\\')
-                .replace('\\n', '\n')
-                .replace('\\t', '\t')
+                inner.replace("\\'", "'")
+                .replace("\\\\", "\\")
+                .replace("\\n", "\n")
+                .replace("\\t", "\t")
             )
 
         return Parser.parse_literal(raw)
@@ -371,18 +388,22 @@ class Parser:
         if lower == "null":
             return None
 
-        if re.fullmatch(r'[+-]?\d+', raw):
+        if re.fullmatch(r"[+-]?\d+", raw):
             return int(raw)
 
-        if re.fullmatch(r'[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?', raw):
+        if re.fullmatch(r"[+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?", raw):
             return float(raw)
 
         return raw
 
-    def extract_html(self, field_name: str, html_attr: Optional[str] = None) -> Optional[str]:
+    def extract_html(
+        self, field_name: str, html_attr: Optional[str] = None
+    ) -> Optional[str]:
         return next(self.iter_html_values(field_name, html_attr), None)
 
-    def extract_all_html(self, field_name: str, html_attr: Optional[str] = None) -> List[str]:
+    def extract_all_html(
+        self, field_name: str, html_attr: Optional[str] = None
+    ) -> List[str]:
         return list(self.iter_html_values(field_name, html_attr))
 
     def iter_html_values(self, field_name: str, html_attr: Optional[str] = None):
@@ -455,11 +476,17 @@ class Parser:
         return ""
 
     @staticmethod
-    def render_html_result(elem: Tag, html_attr: Optional[str] = None, icon_context: bool = False) -> Optional[str]:
+    def render_html_result(
+        elem: Tag, html_attr: Optional[str] = None, icon_context: bool = False
+    ) -> Optional[str]:
         if html_attr:
             target = elem
 
-            if icon_context and html_attr not in target.attrs and isinstance(elem.parent, Tag):
+            if (
+                icon_context
+                and html_attr not in target.attrs
+                and isinstance(elem.parent, Tag)
+            ):
                 target = elem.parent
 
             val = target.get(html_attr)

@@ -3,6 +3,7 @@
 This module defines the objects for notifying the caller about the
 results of queries.
 """
+
 from .result import QueryStatus
 from colorama import Fore, Style
 import webbrowser
@@ -16,11 +17,12 @@ globvar = 0
 wafvar = 0
 blockedvar = 0
 
-ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
+ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 from .__init__ import (
     __version__,
 )
+
 
 class QueryNotify:
     """Query Notify Object.
@@ -173,7 +175,9 @@ class QueryNotifyPrint(QueryNotify):
         print(splash)
 
     def versionAlert(self, version):
-        print(f"{Fore.GREEN}New update available: {Fore.LIGHTGREEN_EX}{version} {Fore.GREEN}({Fore.LIGHTWHITE_EX}https://github.com/SystemCallW/Soylock{Fore.GREEN})")
+        print(
+            f"{Fore.GREEN}New update available: {Fore.LIGHTGREEN_EX}{version} {Fore.GREEN}({Fore.LIGHTWHITE_EX}https://github.com/SystemCallW/Soylock{Fore.GREEN})"
+        )
 
     def start(self, username, message="", new_line=False):
         """Notify Start.
@@ -191,14 +195,22 @@ class QueryNotifyPrint(QueryNotify):
         title = "Checking username"
 
         if new_line:
-            print('\r')
-        print(Style.BRIGHT + Fore.GREEN + "[" +
-              Fore.YELLOW + "*" +
-              Fore.GREEN + f"] {title}" +
-              Fore.WHITE + f" {username}" +
-              Fore.GREEN + f" on{message}:")
+            print("\r")
+        print(
+            Style.BRIGHT
+            + Fore.GREEN
+            + "["
+            + Fore.YELLOW
+            + "*"
+            + Fore.GREEN
+            + f"] {title}"
+            + Fore.WHITE
+            + f" {username}"
+            + Fore.GREEN
+            + f" on{message}:"
+        )
         # An empty line between first line and the result(more clear output)
-        print('\r')
+        print("\r")
 
         return
 
@@ -266,14 +278,20 @@ class QueryNotifyPrint(QueryNotify):
         # Output to the terminal is desired.
         if result.status == QueryStatus.CLAIMED:
             self.countResults()
-            print(Style.BRIGHT + Fore.WHITE + "[" +
-                  Fore.GREEN + "+" +
-                  Fore.WHITE + "]" +
-                  response_time_text +
-                  Fore.GREEN +
-                  f" {self.result.site_name}: " +
-                  Style.RESET_ALL +
-                  f"{self.result.site_url_user}")
+            print(
+                Style.BRIGHT
+                + Fore.WHITE
+                + "["
+                + Fore.GREEN
+                + "+"
+                + Fore.WHITE
+                + "]"
+                + response_time_text
+                + Fore.GREEN
+                + f" {self.result.site_name}: "
+                + Style.RESET_ALL
+                + f"{self.result.site_url_user}"
+            )
             if self.browse:
                 webbrowser.open(self.result.site_url_user, 2)
             if result.fields is not None:
@@ -282,56 +300,107 @@ class QueryNotifyPrint(QueryNotify):
 
         elif result.status == QueryStatus.AVAILABLE:
             if self.print_all:
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      response_time_text +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.YELLOW + " Not Found!")
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + response_time_text
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.YELLOW
+                    + " Not Found!"
+                )
 
         elif result.status == QueryStatus.UNKNOWN:
             if self.print_all:
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.RED + f" {self.result.context}" +
-                      Fore.YELLOW + " ")
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.RED
+                    + f" {self.result.context}"
+                    + Fore.YELLOW
+                    + " "
+                )
 
         elif result.status == QueryStatus.ILLEGAL:
             if self.print_all:
                 msg = "Illegal Username Format For This Site!"
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.YELLOW + f" {msg}")
-                
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.YELLOW
+                    + f" {msg}"
+                )
+
         elif result.status == QueryStatus.WAF:
             self.countWAF()
             if self.print_all:
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.RED + " Blocked by bot detection" +
-                      Fore.YELLOW + " (proxy may help)")
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.RED
+                    + " Blocked by bot detection"
+                    + Fore.YELLOW
+                    + " (proxy may help)"
+                )
         elif result.status == QueryStatus.UNIMPLEMENTED:
             if self.print_all:
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.RED + " This site requires Browser Mode (unimplemented)")
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.RED
+                    + " This site requires Browser Mode (unimplemented)"
+                )
         elif result.status == QueryStatus.BLOCKED:
             self.countBlocked()
             if self.print_all:
-                print(Style.BRIGHT + Fore.WHITE + "[" +
-                      Fore.RED + "-" +
-                      Fore.WHITE + "]" +
-                      Fore.GREEN + f" {self.result.site_name}:" +
-                      Fore.RED + " Blocked by your country" +
-                      Fore.YELLOW + " (proxy may help)")
+                print(
+                    Style.BRIGHT
+                    + Fore.WHITE
+                    + "["
+                    + Fore.RED
+                    + "-"
+                    + Fore.WHITE
+                    + "]"
+                    + Fore.GREEN
+                    + f" {self.result.site_name}:"
+                    + Fore.RED
+                    + " Blocked by your country"
+                    + Fore.YELLOW
+                    + " (proxy may help)"
+                )
 
         else:
             # It should be impossible to ever get here...
@@ -342,11 +411,20 @@ class QueryNotifyPrint(QueryNotify):
         return
 
     def blocked(self, site, message):
-         print(Style.BRIGHT + Fore.WHITE + "[" +
-            Fore.RED + "!" +
-            Fore.WHITE + f"] {site} " +
-            Fore.RED + message +
-            Fore.YELLOW + " (proxy may help)" + Style.RESET_ALL)
+        print(
+            Style.BRIGHT
+            + Fore.WHITE
+            + "["
+            + Fore.RED
+            + "!"
+            + Fore.WHITE
+            + f"] {site} "
+            + Fore.RED
+            + message
+            + Fore.YELLOW
+            + " (proxy may help)"
+            + Style.RESET_ALL
+        )
 
     def finish(self, message="The processing has been finished."):
         """Notify Start.
@@ -361,26 +439,53 @@ class QueryNotifyPrint(QueryNotify):
         NumberOfWAF = self.countWAF() - 1
         NumberOfBlock = self.countBlocked() - 1
 
-        print(Style.BRIGHT + Fore.GREEN + "[" +
-              Fore.YELLOW + "*" +
-              Fore.GREEN + "] Search completed with" +
-              Fore.WHITE + f" {NumberOfResults} " +
-              Fore.GREEN + "results" + Style.RESET_ALL)
+        print(
+            Style.BRIGHT
+            + Fore.GREEN
+            + "["
+            + Fore.YELLOW
+            + "*"
+            + Fore.GREEN
+            + "] Search completed with"
+            + Fore.WHITE
+            + f" {NumberOfResults} "
+            + Fore.GREEN
+            + "results"
+            + Style.RESET_ALL
+        )
         if NumberOfWAF != 0:
-            print(Style.BRIGHT + Fore.WHITE + "[" +
-                  Fore.RED + "-" +
-                  Fore.WHITE + f"] {NumberOfWAF} " +
-                  Fore.RED + "Site got WAF blocked" +
-                  Fore.YELLOW + " (a clean IP may help)" + Style.RESET_ALL)
+            print(
+                Style.BRIGHT
+                + Fore.WHITE
+                + "["
+                + Fore.RED
+                + "-"
+                + Fore.WHITE
+                + f"] {NumberOfWAF} "
+                + Fore.RED
+                + "Site got WAF blocked"
+                + Fore.YELLOW
+                + " (a clean IP may help)"
+                + Style.RESET_ALL
+            )
         if NumberOfBlock != 0:
-            print(Style.BRIGHT + Fore.WHITE + "[" +
-                  Fore.RED + "-" +
-                  Fore.WHITE + f"] {NumberOfBlock} " +
-                  Fore.RED + "Site got country blocked"  +
-                  Fore.YELLOW + " (proxy may help)" + Style.RESET_ALL)
+            print(
+                Style.BRIGHT
+                + Fore.WHITE
+                + "["
+                + Fore.RED
+                + "-"
+                + Fore.WHITE
+                + f"] {NumberOfBlock} "
+                + Fore.RED
+                + "Site got country blocked"
+                + Fore.YELLOW
+                + " (proxy may help)"
+                + Style.RESET_ALL
+            )
 
     def wrap_print(self, prefix, value):
-        visible_prefix = ANSI_RE.sub('', prefix)
+        visible_prefix = ANSI_RE.sub("", prefix)
         indent = " " * len(visible_prefix)
 
         term_width = shutil.get_terminal_size().columns
@@ -396,7 +501,7 @@ class QueryNotifyPrint(QueryNotify):
                     width=wrap_width,
                     break_long_words=False,
                     break_on_hyphens=False,
-                    replace_whitespace=True
+                    replace_whitespace=True,
                 )
                 wrapped_lines.extend(wrapped)
             else:
@@ -417,9 +522,17 @@ class QueryNotifyPrint(QueryNotify):
         bullet = "    " * level + "- "
 
         prefix = (
-            Style.BRIGHT + Fore.WHITE + bullet + Style.RESET_ALL +
-            Style.BRIGHT + Fore.GREEN + str(name) + Style.RESET_ALL +
-            Fore.WHITE + ": " + Style.RESET_ALL
+            Style.BRIGHT
+            + Fore.WHITE
+            + bullet
+            + Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.GREEN
+            + str(name)
+            + Style.RESET_ALL
+            + Fore.WHITE
+            + ": "
+            + Style.RESET_ALL
         )
 
         if isinstance(value, dict):
@@ -432,13 +545,23 @@ class QueryNotifyPrint(QueryNotify):
 
             for index, item in enumerate(value, start=1):
                 if isinstance(item, dict):
-                    item_prefix = (Style.BRIGHT + Fore.WHITE + ("    " * (level + 1)) + Style.RESET_ALL)
+                    item_prefix = (
+                        Style.BRIGHT
+                        + Fore.WHITE
+                        + ("    " * (level + 1))
+                        + Style.RESET_ALL
+                    )
                     print(item_prefix)
 
                     for child_name, child_value in item.items():
                         self.print_field(child_name, child_value, level + 2)
                 elif isinstance(item, str):
-                    item_prefix = (Style.BRIGHT + Fore.WHITE + ("    " * (level + 1)) + Style.RESET_ALL)
+                    item_prefix = (
+                        Style.BRIGHT
+                        + Fore.WHITE
+                        + ("    " * (level + 1))
+                        + Style.RESET_ALL
+                    )
                     print(item_prefix + " - " + item)
                 else:
                     self.print_field(f"Item #{index}", item, level + 1)

@@ -10,7 +10,8 @@ import asyncio
 
 logger = getLogger(__name__)
 
-BackgroundCallback = Callable[['AsyncFuturesSession', Any], Any]
+BackgroundCallback = Callable[["AsyncFuturesSession", Any], Any]
+
 
 class FuturesSession(AsyncSession):
     def __init__(
@@ -30,7 +31,9 @@ class FuturesSession(AsyncSession):
         """
         super().__init__(**kwargs)
         self._semaphore = (
-            asyncio.Semaphore(max_concurrency) if max_concurrency and max_concurrency > 0 else None
+            asyncio.Semaphore(max_concurrency)
+            if max_concurrency and max_concurrency > 0
+            else None
         )
         self.session = session
         self._tasks: Set[asyncio.Task] = set()
@@ -91,6 +94,7 @@ class FuturesSession(AsyncSession):
         coro = self._run_request(method, url, **kwargs)
 
         if background_callback:
+
             async def _with_callback():
                 resp = await coro
                 try:
@@ -99,7 +103,9 @@ class FuturesSession(AsyncSession):
                     else:
                         loop = asyncio.get_running_loop()
 
-                        await loop.run_in_executor(None, partial(background_callback, self, resp))
+                        await loop.run_in_executor(
+                            None, partial(background_callback, self, resp)
+                        )
                 except Exception:
                     logger.exception("Error in background_callback")
                 return resp
@@ -160,9 +166,7 @@ class FuturesSession(AsyncSession):
         :param \*\*kwargs: Optional arguments that ``request`` takes.
         :rtype : concurrent.futures.Future
         """
-        return super(FuturesSession, self).post(
-            url, data=data, json=json, **kwargs
-        )
+        return super(FuturesSession, self).post(url, data=data, json=json, **kwargs)
 
     def put(self, url, data=None, **kwargs):
         r"""Sends a PUT request. Returns :class:`Future` object.

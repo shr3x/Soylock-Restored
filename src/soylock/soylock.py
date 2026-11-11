@@ -45,6 +45,7 @@ from .sites import SitesInformation
 from colorama import init
 from argparse import ArgumentTypeError
 
+
 async def _request_in_thread(
     method: str,
     url: str,
@@ -58,13 +59,12 @@ async def _request_in_thread(
 
     def _do_request():
         session = tls_client.Session(
-            client_identifier="chrome_138",
-            random_tls_extension_order=True
+            client_identifier="chrome_138", random_tls_extension_order=True
         )
         kwargs = {
             "headers": headers,
             "allow_redirects": allow_redirects,
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
         if proxy:
             kwargs["proxy"] = proxy
@@ -87,6 +87,7 @@ async def _request_in_thread(
         loop.run_in_executor(None, _do_request),
         timeout=timeout + 15,
     )
+
 
 async def get_response(request_future, error_type, social_network):
     # Default for Response object if some failure occurs.
@@ -119,6 +120,7 @@ async def get_response(request_future, error_type, social_network):
 
     return response, error_context, exception_text
 
+
 def interpolate_string(input_object, username):
     if isinstance(input_object, str):
         return input_object.replace("{}", username)
@@ -128,12 +130,15 @@ def interpolate_string(input_object, username):
         return [interpolate_string(i, username) for i in input_object]
     return input_object
 
+
 def check_for_parameter(username):
     """checks if {?} exists in the username
     if exist it means that soylock is looking for more multiple username"""
     return "{?}" in username
 
+
 checksymbols = ["_", "-", "."]
+
 
 def multiple_usernames(username):
     """replace the parameter with with symbols and return a list of usernames"""
@@ -141,6 +146,7 @@ def multiple_usernames(username):
     for i in checksymbols:
         allUsernames.append(username.replace("{?}", i))
     return allUsernames
+
 
 async def soylock(
     username: str,
@@ -170,30 +176,30 @@ async def soylock(
     results_total = {}
 
     WAFHitMsgs = [
-        r'.loading-spinner{visibility:hidden}body.no-js .challenge-running{display:none}body.dark{background-color:#222;color:#d9d9d9}body.dark a{color:#fff}body.dark a:hover{color:#ee730a;text-decoration:underline}body.dark .lds-ring div{border-color:#999 transparent transparent}body.dark .font-red{color:#b20f03}body.dark',  # 2024-05-13 Cloudflare
+        r".loading-spinner{visibility:hidden}body.no-js .challenge-running{display:none}body.dark{background-color:#222;color:#d9d9d9}body.dark a{color:#fff}body.dark a:hover{color:#ee730a;text-decoration:underline}body.dark .lds-ring div{border-color:#999 transparent transparent}body.dark .font-red{color:#b20f03}body.dark",  # 2024-05-13 Cloudflare
         r'<span id="challenge-error-text">',  # 2024-11-11 Cloudflare error page
-        r'AwsWafIntegration.forceRefreshToken',  # 2024-11-11 Cloudfront (AWS)
+        r"AwsWafIntegration.forceRefreshToken",  # 2024-11-11 Cloudfront (AWS)
         r'{return l.onPageView}}),Object.defineProperty(r,"perimeterxIdentifiers",{enumerable:',  # 2024-04-09 PerimeterX / Human Security
-        'We’re committed to safety and security. Unless you’re a bot. Complete the challenge below and let us know you’re',  # 2025-11-07 Reddit
-        'Please wait while your request is being verified...',  # 2025-11-11 OurDJTalk
-        'Your request has been blocked due to a network policy.', # 2026-06-08 Reddit
-        '<noscript><p><b>JavaScript is required to access this page.</b></p></noscript>', # 2026-06-08 MusicBrainz
-        '<head><title>415 Unsupported Media Type</title></head>',  # 2026-06-08 OurDJTalk
-        'https://assets.guns.lol/wasm/gpp_gunslol.js', # 2026-06-09 guns.lol
-        '<title>Reddit - Please wait for verification</title>', # 2026-06-10 Reddit
-        'This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data.', # 2026-06-14 Cloudflare
-        'You\'ve been blocked by network security.', # 2026-06-14 Reddit
-        '<title>Just a moment...</title>', # 2026-06-28 Cloudflare
-        '<div id="loading-error" role="alert" aria-live="polite">' # 2026-06-28 Houzz
+        "We’re committed to safety and security. Unless you’re a bot. Complete the challenge below and let us know you’re",  # 2025-11-07 Reddit
+        "Please wait while your request is being verified...",  # 2025-11-11 OurDJTalk
+        "Your request has been blocked due to a network policy.",  # 2026-06-08 Reddit
+        "<noscript><p><b>JavaScript is required to access this page.</b></p></noscript>",  # 2026-06-08 MusicBrainz
+        "<head><title>415 Unsupported Media Type</title></head>",  # 2026-06-08 OurDJTalk
+        "https://assets.guns.lol/wasm/gpp_gunslol.js",  # 2026-06-09 guns.lol
+        "<title>Reddit - Please wait for verification</title>",  # 2026-06-10 Reddit
+        "This website is using a security service to protect itself from online attacks. The action you just performed triggered the security solution. There are several actions that could trigger this block including submitting a certain word or phrase, a SQL command or malformed data.",  # 2026-06-14 Cloudflare
+        "You've been blocked by network security.",  # 2026-06-14 Reddit
+        "<title>Just a moment...</title>",  # 2026-06-28 Cloudflare
+        '<div id="loading-error" role="alert" aria-live="polite">',  # 2026-06-28 Houzz
     ]
 
     RegulationHitMsgs = [
         '<link rel="stylesheet" href="/dist/age-wall.min.',  # 2025-11-11 Pornhub / YouPorn / RedTube
-        'Although this platform is, and has always been, for adults only, as it appears you are accessing the platform from',  # 2025-11-11 ChaturBate
-        'Visitors from United Kingdom must verify their age to access this site.',  # 2025-11-11 BongaCams
-        'To continue, we are required to verify that you are 18 or older, in line with the UK Online Safety Act.',  # 2025-11-11 LushStories / Pornhub (A) / YouPorn (A) / RedTube (A)
-        'We\'ve had to temporarily block access to the APClips preview area from your state.', # 2026-06-08 APClips
-        'Youporn is not currently accepting new account registrations in your region' # 2026-06-08 Youporn
+        "Although this platform is, and has always been, for adults only, as it appears you are accessing the platform from",  # 2025-11-11 ChaturBate
+        "Visitors from United Kingdom must verify their age to access this site.",  # 2025-11-11 BongaCams
+        "To continue, we are required to verify that you are 18 or older, in line with the UK Online Safety Act.",  # 2025-11-11 LushStories / Pornhub (A) / YouPorn (A) / RedTube (A)
+        "We've had to temporarily block access to the APClips preview area from your state.",  # 2026-06-08 APClips
+        "Youporn is not currently accepting new account registrations in your region",  # 2026-06-08 Youporn
     ]
 
     class ProbeResult:
@@ -239,9 +245,9 @@ async def soylock(
             "cache-control": "no-cache",
             "content-type": "application/json",
             "pragma": "no-cache",
-            "sec-ch-ua": "\"Google Chrome\";v=\"138\", \"Chromium\";v=\"138\", \"Not_A Brand\";v=\"24\"",
+            "sec-ch-ua": '"Google Chrome";v="138", "Chromium";v="138", "Not_A Brand";v="24"',
             "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
@@ -279,7 +285,9 @@ async def soylock(
 
         if error_type == "message":
             try:
-                status_code_val = int(http_status) if http_status not in (None, "?") else None
+                status_code_val = (
+                    int(http_status) if http_status not in (None, "?") else None
+                )
             except Exception:
                 status_code_val = None
 
@@ -318,7 +326,9 @@ async def soylock(
                 return QueryStatus.WAF, None
             if http_status in (0, 500):
                 return QueryStatus.UNKNOWN, None
-            if isinstance(http_status, int) and (http_status >= 300 or http_status < 200):
+            if isinstance(http_status, int) and (
+                http_status >= 300 or http_status < 200
+            ):
                 return QueryStatus.AVAILABLE, None
             if http_status in (None, "?"):
                 return QueryStatus.UNKNOWN, None
@@ -568,7 +578,10 @@ async def soylock(
         return list(dump_urls)
 
     def _normalize_found_url(candidate_url, url_filter):
-        if ("https://www.youtube.com/redirect?" in candidate_url or "https://steamcommunity.com/linkfilter" in candidate_url):
+        if (
+            "https://www.youtube.com/redirect?" in candidate_url
+            or "https://steamcommunity.com/linkfilter" in candidate_url
+        ):
             return urllib.parse.unquote(candidate_url.split("=")[-1])
         if "sf16-va.tiktokcdn.com" in candidate_url:
             return None
@@ -635,15 +648,18 @@ async def soylock(
                             if value is None or value == "":
                                 continue
 
-                            if (isinstance(value, int) or (isinstance(value, str) and value.isdigit())) and "date" in output_field.lower():
-                                value = datetime.fromtimestamp(int(value)).strftime("%Y-%m-%d %H:%M:%S")
+                            if (
+                                isinstance(value, int)
+                                or (isinstance(value, str) and value.isdigit())
+                            ) and "date" in output_field.lower():
+                                value = datetime.fromtimestamp(int(value)).strftime(
+                                    "%Y-%m-%d %H:%M:%S"
+                                )
 
                             update_values[output_field] = value
                             break
                     if update_values:
-                        update = {
-                            str(index): update_values
-                        }
+                        update = {str(index): update_values}
                         _update_fields(found_fields, update)
             else:
                 found = parser.find(path)
@@ -661,7 +677,9 @@ async def soylock(
 
             for url_filter in url_filters:
                 if url_attr:
-                    urls.extend(parser.find_all(url_filter, strategy="html", html_attr=url_attr))
+                    urls.extend(
+                        parser.find_all(url_filter, strategy="html", html_attr=url_attr)
+                    )
                 else:
                     urls.extend(parser.find_all(url_filter))
 
@@ -672,14 +690,21 @@ async def soylock(
 
                 for url_filter in url_filters:
                     normalized_url = ""
-                    if ("https://www.youtube.com/redirect?" in candidate_url or "https://steamcommunity.com/linkfilter" in candidate_url):
-                        normalized_url = urllib.parse.unquote(candidate_url.split("=")[-1])
+                    if (
+                        "https://www.youtube.com/redirect?" in candidate_url
+                        or "https://steamcommunity.com/linkfilter" in candidate_url
+                    ):
+                        normalized_url = urllib.parse.unquote(
+                            candidate_url.split("=")[-1]
+                        )
                     if "sf16-va.tiktokcdn.com" in candidate_url:
                         continue
                     if url_filter == "url":
                         continue
                     if "http" in candidate_url:
-                        normalized_url = codecs.decode(urllib.parse.unquote(candidate_url), "unicode_escape")
+                        normalized_url = codecs.decode(
+                            urllib.parse.unquote(candidate_url), "unicode_escape"
+                        )
                     if "/cdn-cgi/l/email-protection" in candidate_url:
                         normalized_url = "Found javascript protected email (you can copy it from browser)"
                     if normalized_url:
@@ -687,7 +712,9 @@ async def soylock(
 
             if found_urls:
                 unique_urls = list(dict.fromkeys(found_urls))
-                found_fields["Urls"] = "\n".join(unique_urls) + " (a chunk of the links may be stripped)"
+                found_fields["Urls"] = (
+                    "\n".join(unique_urls) + " (a chunk of the links may be stripped)"
+                )
 
         return found_fields
 
@@ -808,8 +835,7 @@ async def soylock(
         results_total[social_network] = results_site
 
     session = tls_client.Session(
-        client_identifier="chrome_138",
-        random_tls_extension_order=True
+        client_identifier="chrome_138", random_tls_extension_order=True
     )
 
     if not disable_archive:
@@ -828,7 +854,9 @@ async def soylock(
 
                 for archive_url in url_list:
                     url_probe = interpolate_string(archive_url, username)
-                    response = session.get(f"https://archive.org/wayback/available?url={url_probe}/")
+                    response = session.get(
+                        f"https://archive.org/wayback/available?url={url_probe}/"
+                    )
                     response_text = _safe_attr(response, "text", "")
                     response_time = _safe_attr(response, "elapsed")
                     response_headers = _safe_attr(response, "headers", {})
@@ -837,11 +865,14 @@ async def soylock(
                         query_notify.blocked("Archive.org", "Too Many Requests")
                         blocked = True
                         break
-                    if "archived_snapshots\": {}" not in response_text:
+                    if 'archived_snapshots": {}' not in response_text:
                         result = QueryResult(
                             username=username,
                             site_name=social_network,
-                            site_url_user=interpolate_string(f"https://web.archive.org/web/*/{archive_url}/", username),
+                            site_url_user=interpolate_string(
+                                f"https://web.archive.org/web/*/{archive_url}/",
+                                username,
+                            ),
                             status=QueryStatus.CLAIMED,
                             query_time=response_time,
                         )
@@ -851,6 +882,7 @@ async def soylock(
                         break
 
     return results_total
+
 
 def timeout_check(value):
     """Check Timeout Argument.
@@ -876,6 +908,7 @@ def timeout_check(value):
 
     return float_value
 
+
 def tabs_check(value):
     """Check tabs Argument.
 
@@ -891,9 +924,8 @@ def tabs_check(value):
     NOTE:  Will raise an exception if the tabs is invalid.
     """
 
-
     int_value = int(value)
-    
+
     if int_value <= 0:
         raise ArgumentTypeError(
             f"Invalid tabs value: {value}. Tabs must be a positive number."
@@ -912,6 +944,7 @@ def handler(signal_received, frame):
     Source: https://www.devdungeon.com/content/python-catch-sigint-ctrl-c
     """
     sys.exit(0)
+
 
 async def main():
     parser = ArgumentParser(
@@ -1083,7 +1116,6 @@ async def main():
         dest="output_txt",
         default=False,
         help="Enable creation of a txt file",
-
     )
 
     args = parser.parse_args()
@@ -1114,9 +1146,11 @@ async def main():
 
     # Create object with all information about sites we are aware of.
     try:
-         if args.local:
-            sites = SitesInformation(os.path.join(os.path.dirname(__file__), "resources/data.json"))
-         else:
+        if args.local:
+            sites = SitesInformation(
+                os.path.join(os.path.dirname(__file__), "resources/data.json")
+            )
+        else:
             json_file_location = args.json_file
             if args.json_file:
                 # If --json parameter is a number, interpret it as a pull request number
@@ -1140,7 +1174,9 @@ async def main():
                         print("Failed to fetch PR info from GitHub.")
                         sys.exit(1)
 
-            sites = SitesInformation(os.path.join(os.path.dirname(__file__), "resources/data.json"))
+            sites = SitesInformation(
+                os.path.join(os.path.dirname(__file__), "resources/data.json")
+            )
     except Exception as error:
         print(f"ERROR:  {error}")
         sys.exit(1)
@@ -1191,7 +1227,7 @@ async def main():
         if r.status_code == 200:
             data = r.json()
             tag = data.get("tag_name")
-            if tag != "v" +__version__:
+            if tag != "v" + __version__:
                 query_notify.versionAlert(tag)
     except Exception:
         pass  # Silently fail version check if offline
@@ -1200,7 +1236,9 @@ async def main():
     engine = None
     session = None
     if not args.disable_browser:
-        max_workers = args.tabs if args.tabs else (5 if len(site_data) >= 20 else len(site_data))
+        max_workers = (
+            args.tabs if args.tabs else (5 if len(site_data) >= 20 else len(site_data))
+        )
         engine = BrowserEngine(
             max_workers=max_workers,
             headless=True,
@@ -1228,7 +1266,7 @@ async def main():
                 dump_response=args.dump_response,
                 proxy=args.proxy,
                 timeout=args.timeout,
-                disable_archive=args.disable_archive
+                disable_archive=args.disable_archive,
             )
 
             if args.output:
@@ -1249,7 +1287,9 @@ async def main():
                         if dictionary.get("status").status == QueryStatus.CLAIMED:
                             exists_counter += 1
                             file.write(dictionary["url_user"] + "\n")
-                    file.write(f"Total Websites Username Detected On : {exists_counter}\n")
+                    file.write(
+                        f"Total Websites Username Detected On : {exists_counter}\n"
+                    )
 
             if args.csv:
                 result_file = f"{username}.csv"
@@ -1326,8 +1366,8 @@ async def main():
                     {
                         "username": usernames,
                         "name": names,
-                        "url_main": [f'=HYPERLINK(\"{u}\")' for u in url_main],
-                        "url_user": [f'=HYPERLINK(\"{u}\")' for u in url_user],
+                        "url_main": [f'=HYPERLINK("{u}")' for u in url_main],
+                        "url_user": [f'=HYPERLINK("{u}")' for u in url_user],
                         "exists": exists,
                         "http_status": http_status,
                         "response_time_s": response_time_s,
@@ -1341,6 +1381,7 @@ async def main():
             await engine.close()
 
     query_notify.finish()
+
 
 def run_soylock():
     asyncio.run(main())

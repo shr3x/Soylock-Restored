@@ -68,6 +68,7 @@ PIERCE_CHECKBOX_JS = """
 }
 """
 
+
 def pierce_and_return_iframe_js():
     """
     Returns an IIFE that pierces intercepted closed shadow roots on the
@@ -122,20 +123,22 @@ async def is_challenge_present(page: Page) -> bool:
         title = await page.title()
         content = await page.content()
         return (
-            'Just a moment...' in title
-            or 'NG Guard' in title
-            or 'Reddit - Please wait for verification' in title
-            or 'Enable JavaScript and cookies to continue' in content
-            or 'This requires JavaScript. Enable JavaScript and then reload the page.' in content
-            or 'This may be caused by certain browser extensions, such as ad blockers, or by connecting through a VPN or proxy.' in content
+            "Just a moment..." in title
+            or "NG Guard" in title
+            or "Reddit - Please wait for verification" in title
+            or "Enable JavaScript and cookies to continue" in content
+            or "This requires JavaScript. Enable JavaScript and then reload the page."
+            in content
+            or "This may be caused by certain browser extensions, such as ad blockers, or by connecting through a VPN or proxy."
+            in content
             or '<div id="loading-error" role="alert" aria-live="polite">' in content
-            or 'Please wait while your request is being verified...' in content
+            or "Please wait while your request is being verified..." in content
             or '<img class="loading-img" src="/pre-loading.png">' in content
-            or 'https://assets.guns.lol/wasm/gpp_gunslol.js' in content
-            or 'Please enable JavaScript to continue.' in content
-            or 'Verifying your browser, please wait' in content
-            or 'Checking your browser' in content
-            or 'cf-challenge' in content
+            or "https://assets.guns.lol/wasm/gpp_gunslol.js" in content
+            or "Please enable JavaScript to continue." in content
+            or "Verifying your browser, please wait" in content
+            or "Checking your browser" in content
+            or "cf-challenge" in content
         )
     except Exception:
         return False
@@ -178,9 +181,9 @@ async def click_cf_checkbox(page: Page, max_attempts: int = 60) -> bool:
 
         # ── Strategy A: Coordinate-based click ──
         candidates = [
-            (box['x'] + 20, box['y'] + box['height'] / 2),
-            (box['x'] + box['width'] * 0.12, box['y'] + box['height'] / 2),
-            (box['x'] + 30, box['y'] + 30),
+            (box["x"] + 20, box["y"] + box["height"] / 2),
+            (box["x"] + box["width"] * 0.12, box["y"] + box["height"] / 2),
+            (box["x"] + 30, box["y"] + 30),
         ]
 
         clicked = False
@@ -207,9 +210,9 @@ async def click_cf_checkbox(page: Page, max_attempts: int = 60) -> bool:
                 frame = await iframe_handle.content_frame()
                 if frame:
                     coords = await frame.evaluate(PIERCE_CHECKBOX_JS)
-                    if coords and coords.get('found'):
-                        abs_x = box['x'] + coords['x']
-                        abs_y = box['y'] + coords['y']
+                    if coords and coords.get("found"):
+                        abs_x = box["x"] + coords["x"]
+                        abs_y = box["y"] + coords["y"]
                         await page.mouse.move(abs_x, abs_y, steps=12)
                         await asyncio.sleep(0.1)
                         await page.mouse.click(abs_x, abs_y)
