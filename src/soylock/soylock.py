@@ -1140,11 +1140,7 @@ async def main():
                         print("Failed to fetch PR info from GitHub.")
                         sys.exit(1)
 
-            try:
-                sites = SitesInformation(data_file_path=json_file_location)
-            except:
-                print("Failed to download data from github. Fallback to local data.")
-                sites = SitesInformation(os.path.join(os.path.dirname(__file__), "resources/data.json"))
+            sites = SitesInformation(os.path.join(os.path.dirname(__file__), "resources/data.json"))
     except Exception as error:
         print(f"ERROR:  {error}")
         sys.exit(1)
