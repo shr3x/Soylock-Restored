@@ -4,13 +4,13 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Optional, Dict, Any
 
-from browser import patch
+from . import patch
 
 from camoufox import AsyncCamoufox
 from playwright.async_api import Page, Error as PlaywrightError
-from setup import get_browser_path
+from ..setup import get_browser_path
 
-from browser.helper import (
+from .helper import (
     SHADOW_INTERCEPT_SCRIPT,
     is_challenge_present,
     click_cf_checkbox,

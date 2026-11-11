@@ -21,27 +21,27 @@ import requests
 import urllib.parse
 import codecs
 import collections
-from parser import Parser
+from .parser import Parser
 from datetime import datetime
 from dataclasses import dataclass
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from json import loads as json_loads
 from typing import Any, Optional, Union
 
-from browser.client import BrowserEngine, BrowserSession
+from .browser.client import BrowserEngine, BrowserSession
 
-from __init__ import (
+from .__init__ import (
     __longname__,
     __shortname__,
     __version__,
     forge_api_latest_release,
 )
 
-from result import QueryStatus
-from result import QueryResult
-from notify import QueryNotify
-from notify import QueryNotifyPrint
-from sites import SitesInformation
+from .result import QueryStatus
+from .result import QueryResult
+from .notify import QueryNotify
+from .notify import QueryNotifyPrint
+from .sites import SitesInformation
 from colorama import init
 from argparse import ArgumentTypeError
 
@@ -1346,5 +1346,5 @@ async def main():
 
     query_notify.finish()
 
-if __name__ == "__main__":
+def run_soylock():
     asyncio.run(main())

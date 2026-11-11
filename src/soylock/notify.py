@@ -3,7 +3,7 @@
 This module defines the objects for notifying the caller about the
 results of queries.
 """
-from result import QueryStatus
+from .result import QueryStatus
 from colorama import Fore, Style
 import webbrowser
 import textwrap
@@ -18,7 +18,7 @@ blockedvar = 0
 
 ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
 
-from __init__ import (
+from .__init__ import (
     __version__,
 )
 
