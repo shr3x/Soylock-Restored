@@ -762,7 +762,7 @@ wheels = [
 ]
 
 [[package]]
-name = "soylock-main"
+name = "soylock"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
