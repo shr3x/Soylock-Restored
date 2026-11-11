@@ -59,7 +59,7 @@ async def _request_in_thread(
 
     def _do_request():
         session = tls_client.Session(
-            client_identifier="chrome_138", random_tls_extension_order=True
+            client_identifier="chrome_133", random_tls_extension_order=True
         )
         kwargs = {
             "headers": headers,
@@ -245,7 +245,7 @@ async def soylock(
             "cache-control": "no-cache",
             "content-type": "application/json",
             "pragma": "no-cache",
-            "sec-ch-ua": '"Google Chrome";v="138", "Chromium";v="138", "Not_A Brand";v="24"',
+            "sec-ch-ua": '"Google Chrome";v="133", "Chromium";v="133", "Not_A Brand";v="24"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
             "sec-fetch-dest": "empty",
@@ -254,7 +254,7 @@ async def soylock(
             "user-agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/138.0.0.0 Safari/537.36"
+                "Chrome/133.0.0.0 Safari/537.36"
             ),
         }
 
@@ -835,7 +835,7 @@ async def soylock(
         results_total[social_network] = results_site
 
     session = tls_client.Session(
-        client_identifier="chrome_138", random_tls_extension_order=True
+        client_identifier="chrome_133", random_tls_extension_order=True
     )
 
     if not disable_archive:
