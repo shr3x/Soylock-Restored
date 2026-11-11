@@ -7,7 +7,7 @@ Restoration of **Soylock**, because it was removed by SystemCallW. Now uses `uv`
 
 ## Usage:
 ```
-uv run soylock.py <name>
+uv run soylock <name>
 ```
 
 UV will install the dependencies for you.
