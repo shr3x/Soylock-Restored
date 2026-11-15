@@ -753,6 +753,15 @@ wheels = [
 ]
 
 [[package]]
+name = "setuptools"
+version = "84.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz", hash = "sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc", size = 1230289, upload-time = "2026-10-20T19:01:37.742Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl", hash = "sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2", size = 876263, upload-time = "2026-10-20T19:01:35.678Z" },
+]
+
+[[package]]
 name = "soupsieve"
 version = "4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -774,6 +783,12 @@ dependencies = [
     { name = "tls-client" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "setuptools" },
+    { name = "types-colorama" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
@@ -782,6 +797,12 @@ requires-dist = [
     { name = "pandas", specifier = ">=3.1.1" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "tls-client", specifier = ">=2.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "setuptools", specifier = ">=84.2.1" },
+    { name = "types-colorama", specifier = ">=0.4.15.20260508" },
 ]
 
 [[package]]
@@ -798,6 +819,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/23/49c35ca3822c833eb9863417efd17735cc6c4d7a85aa8b8f7f5954610874/tls_client-2.0.0-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:c7d5f44160d2991fdde017e5e2f951138c2896c4e0fba58750932fae8ebafff3", size = 8540824, upload-time = "2026-10-10T15:22:18.272Z" },
     { url = "https://files.pythonhosted.org/packages/a7/e5/ed7fc01c7bb893389cd9b9ef612b9796430c5c4db373465cecd24066ceb1/tls_client-2.0.0-py3-none-win32.whl", hash = "sha256:74bb3f7ab0c4da5d9491214f2c5086d069d10748b1b2d55f5b34d2ce25195801", size = 8341809, upload-time = "2026-10-10T15:22:20.914Z" },
     { url = "https://files.pythonhosted.org/packages/cb/83/392dd8c4079a09d2c079b044902b0960a28d0fc5215efb17d5f8a5be51ee/tls_client-2.0.0-py3-none-win_amd64.whl", hash = "sha256:1518f81e2007634d22b87fcdc04c6d21d40ff45eb1d745494d0937aa49b424ae", size = 8439576, upload-time = "2026-10-10T15:22:22.9Z" },
+]
+
+[[package]]
+name = "types-colorama"
+version = "0.4.15.20260508"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/be/d5/4870d88c6c87adf786ef33d674cbf82b3a2d5fcbe6deec29282cff80e8b3/types_colorama-0.4.15.20260508.tar.gz", hash = "sha256:3a8916039e57452bd21f57e674e1f221ca9e4f319893c5e3bbd37b845c27d8e6", size = 10638, upload-time = "2026-05-08T04:47:14.593Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/33/a3449e3e93c43861b92d0a93ed4ea5505756463e507625812cfb29c91c7a/types_colorama-0.4.15.20260508-py3-none-any.whl", hash = "sha256:b0c39908a3e5171ef1f8bf3d59fae082e9eaff3a19ca49b6d640b83f78cff61c", size = 10755, upload-time = "2026-05-08T04:47:13.761Z" },
 ]
 
 [[package]]

@@ -61,7 +61,7 @@ async def _request_in_thread(
         session = tls_client.Session(
             client_identifier="chrome_133", random_tls_extension_order=True
         )
-        kwargs = {
+        kwargs: dict[str, Any] = {
             "headers": headers,
             "allow_redirects": allow_redirects,
             "timeout_seconds": timeout,
@@ -643,6 +643,8 @@ async def soylock(
                             continue
 
                         for sub_path in _as_list(possible_paths):
+                            if not isinstance(row, dict):
+                                continue
                             value = row.get(sub_path)
 
                             if value is None or value == "":
@@ -685,7 +687,7 @@ async def soylock(
 
             found_urls = []
             for candidate_url in urls:
-                if candidate_url is None or url in candidate_url:
+                if not isinstance(candidate_url, str) or url in candidate_url:
                     continue
 
                 for url_filter in url_filters:
@@ -834,7 +836,7 @@ async def soylock(
         social_network, results_site = await completed
         results_total[social_network] = results_site
 
-    session = tls_client.Session(
+    archive_session = tls_client.Session(
         client_identifier="chrome_133", random_tls_extension_order=True
     )
 
@@ -854,7 +856,7 @@ async def soylock(
 
                 for archive_url in url_list:
                     url_probe = interpolate_string(archive_url, username)
-                    response = session.get(
+                    response = archive_session.get(
                         f"https://archive.org/wayback/available?url={url_probe}/"
                     )
                     response_text = _safe_attr(response, "text", "")

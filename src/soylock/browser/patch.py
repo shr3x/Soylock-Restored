@@ -17,7 +17,7 @@ def _patched_camoufox_path(download_if_missing=True):
     return camoufox.pkgman.INSTALL_DIR
 
 
-camoufox.pkgman.camoufox_path = _patched_camoufox_path
+setattr(camoufox.pkgman, "camoufox_path", _patched_camoufox_path)
 
 _orig_installed_verstr = camoufox.pkgman.installed_verstr
 
@@ -27,7 +27,7 @@ def _patched_installed_verstr():
     return "150.0.2-alpha.26"
 
 
-camoufox.pkgman.installed_verstr = _patched_installed_verstr
+setattr(camoufox.pkgman, "installed_verstr", _patched_installed_verstr)
 _orig_launch_path = camoufox.pkgman.launch_path
 
 
@@ -46,18 +46,15 @@ def _patched_launch_path(browser_path=None):
     return str(browser_path / exe_name)
 
 
-camoufox.pkgman.launch_path = _patched_launch_path
+setattr(camoufox.pkgman, "launch_path", _patched_launch_path)
 
 for mod_name in list(sys.modules.keys()):
     if not mod_name.startswith("camoufox."):
         continue
     mod = sys.modules[mod_name]
-    if hasattr(mod, "camoufox_path") and mod.camoufox_path is _orig_camoufox_path:
-        mod.camoufox_path = _patched_camoufox_path
-    if (
-        hasattr(mod, "installed_verstr")
-        and mod.installed_verstr is _orig_installed_verstr
-    ):
-        mod.installed_verstr = _patched_installed_verstr
-    if hasattr(mod, "launch_path") and mod.launch_path is _orig_launch_path:
-        mod.launch_path = _patched_launch_path
+    if getattr(mod, "camoufox_path", None) is _orig_camoufox_path:
+        setattr(mod, "camoufox_path", _patched_camoufox_path)
+    if getattr(mod, "installed_verstr", None) is _orig_installed_verstr:
+        setattr(mod, "installed_verstr", _patched_installed_verstr)
+    if getattr(mod, "launch_path", None) is _orig_launch_path:
+        setattr(mod, "launch_path", _patched_launch_path)

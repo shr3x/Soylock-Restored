@@ -58,7 +58,7 @@ class Parser:
     ) -> List[JSONValue]:
         if isinstance(field_name, (list, tuple)):
             if strategy in ("auto", "json"):
-                return self.extract_all_json_records(list(field_name))
+                return list(self.extract_all_json_records(list(field_name)))
             return []
 
         results = []
@@ -101,7 +101,7 @@ class Parser:
         if not field_names:
             return []
 
-        rows = []
+        rows: List[Dict[str, JSONValue]] = []
         parsed = self.parse_jsonish_container(self.raw)
         if parsed is not None:
             self.collect_json_records(parsed, field_names, rows)
@@ -114,11 +114,11 @@ class Parser:
     def extract_all_json_records_by_scan(
         self, field_names: List[str]
     ) -> List[Dict[str, JSONValue]]:
-        rows = []
+        rows: List[Dict[str, JSONValue]] = []
 
         for obj_text in self.iter_leaf_json_object_texts():
             row_parser = Parser(obj_text)
-            row = {}
+            row: Dict[str, JSONValue] = {}
 
             for field_name in field_names:
                 val = row_parser.extract_json(field_name)
@@ -424,14 +424,14 @@ class Parser:
 
     def iter_html_matches(self, field_name: str):
         for attr in self.HTML_FIELD_ATTRS:
-            for elem in self.soup.find_all(attrs={attr: field_name}):
+            for elem in self.soup.find_all(name=None, attrs={attr: field_name}):
                 yield elem, False
 
         for elem in self.find_all_by_class_tokens(field_name):
             yield elem, True
 
         for elem in self.soup.find_all(
-            attrs={"class": lambda x: x and field_name in x}
+            name=None, attrs={"class": lambda x: bool(x and field_name in x)}
         ):
             yield elem, False
 

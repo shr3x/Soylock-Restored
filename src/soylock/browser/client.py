@@ -2,12 +2,12 @@ import asyncio
 import time
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, cast
 
 from . import patch
 
 from camoufox import AsyncCamoufox
-from playwright.async_api import Page, Error as PlaywrightError
+from playwright.async_api import Browser, BrowserContext, Page, Error as PlaywrightError
 from ..setup import get_browser_path
 
 from .helper import (
@@ -50,9 +50,9 @@ class BrowserEngine:
         self.headless = headless
         self.proxy = proxy
         self._camoufox = None
-        self.browser = None
-        self.context = None
-        self.anchor = None
+        self.browser: Optional[Browser] = None
+        self.context: Optional[BrowserContext] = None
+        self.anchor: Optional[Page] = None
         self._page_pool = asyncio.Queue()
         self._semaphore = asyncio.Semaphore(max_workers)
         self._captcha_lock = asyncio.Lock()  # ← global captcha serializer
@@ -83,7 +83,8 @@ class BrowserEngine:
             camoufox_config["proxy"] = {"server": self.proxy}
 
         self._camoufox = AsyncCamoufox(**camoufox_config)
-        self.browser = await self._camoufox.__aenter__()
+        # AsyncCamoufox yields a Browser unless persistent_context is enabled.
+        self.browser = cast(Browser, await self._camoufox.__aenter__())
         self.context = await self.browser.new_context()
 
         # Anchor page: start on real origin for reliable tab spawning
@@ -116,6 +117,9 @@ class BrowserEngine:
 
     async def _create_empty_tab(self) -> Optional[Page]:
         """Create a new empty tab via injected <a> click from anchor."""
+        if self.context is None or self.anchor is None:
+            raise RuntimeError("BrowserEngine has not been started")
+
         known_before = set(self.context.pages)
 
         try:

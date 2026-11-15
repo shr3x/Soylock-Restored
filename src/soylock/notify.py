@@ -52,7 +52,7 @@ class QueryNotify:
 
         # return
 
-    def start(self, message=None):
+    def start(self, username, message="", new_line=False):
         """Notify Start.
 
         Notify method for start of query.  This method will be called before
@@ -61,9 +61,29 @@ class QueryNotify:
 
         Keyword Arguments:
         self                   -- This object.
-        message                -- Object that is used to give context to start
-                                  of query.
-                                  Default is None.
+        username               -- String containing username that the series
+                                  of queries are about.
+        message                -- Extra context appended to the start line.
+        new_line               -- Boolean indicating whether to print a blank
+                                  line first.
+
+        Return Value:
+        Nothing.
+        """
+
+        # return
+
+    def blocked(self, site, message):
+        """Notify Blocked.
+
+        Notify method for a site that blocked the query.  This method will
+        typically be overridden by higher level classes that will inherit
+        from it.
+
+        Keyword Arguments:
+        self                   -- This object.
+        site                   -- Name of the site that blocked the query.
+        message                -- Reason given for the block.
 
         Return Value:
         Nothing.

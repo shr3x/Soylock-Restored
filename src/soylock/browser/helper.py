@@ -149,7 +149,7 @@ async def get_cf_iframe_handle(page: Page) -> Optional[ElementHandle]:
     try:
         handle = await page.evaluate_handle(pierce_and_return_iframe_js())
         if handle and await handle.evaluate("el => !!el"):
-            return handle
+            return handle.as_element()
     except Exception as e:
         print(f"Shadow piercing failed: {e}")
     return None
