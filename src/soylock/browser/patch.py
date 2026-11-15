@@ -1,8 +1,7 @@
 import sys
-from pathlib import Path
 import camoufox.pkgman
 
-DIST_DIR = Path(__file__).parent / "../dist"
+from ..setup import DIST_DIR
 
 camoufox.pkgman.INSTALL_DIR = DIST_DIR.resolve()
 

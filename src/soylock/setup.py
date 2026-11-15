@@ -8,7 +8,33 @@ import shutil
 import stat
 from pathlib import Path
 
-DIST_DIR = Path("dist")
+
+def _default_dist_dir() -> Path:
+    """Where the Camoufox bundle lives, regardless of the current directory.
+
+    1. $SOYLOCK_DIST_DIR if set.
+    2. <repo>/dist when running from a source checkout.
+    3. A per-user data folder when installed as a package.
+    """
+    env = os.environ.get("SOYLOCK_DIST_DIR")
+    if env:
+        return Path(env).expanduser().resolve()
+
+    repo_root = Path(__file__).resolve().parents[2]
+    if (repo_root / "pyproject.toml").exists():
+        return repo_root / "dist"
+
+    system = platform.system().lower()
+    if system == "windows":
+        base = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local"))
+    elif system == "darwin":
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+    return base / "soylock" / "dist"
+
+
+DIST_DIR = _default_dist_dir()
 VALIDATION_FILES = ["properties.json"]
 
 PLATFORM_CONFIGS = {
@@ -161,16 +187,18 @@ def find_executable(dist_path: Path) -> Path | None:
     return None
 
 
-def download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
-    """Download a file with a simple progress indicator."""
+def download_file(url: str, dest: Path, chunk_size: int = 1024 * 1024) -> None:
+    """Download a file to a temporary .part file, then move it into place."""
     print(f"[setup] Downloading:\n  {url}")
     dest.parent.mkdir(parents=True, exist_ok=True)
+    part = dest.with_name(dest.name + ".part")
 
     try:
         with urllib.request.urlopen(url, timeout=120) as response:
             total = int(response.headers.get("Content-Length", 0))
             downloaded = 0
-            with open(dest, "wb") as f:
+            last_pct = -1
+            with open(part, "wb") as f:
                 while True:
                     chunk = response.read(chunk_size)
                     if not chunk:
@@ -179,17 +207,28 @@ def download_file(url: str, dest: Path, chunk_size: int = 8192) -> None:
                     downloaded += len(chunk)
                     if total > 0:
                         pct = downloaded * 100 // total
-                        sys.stdout.write(
-                            f"\r[setup] {pct}% ({downloaded:,} / {total:,} bytes)"
-                        )
-                        sys.stdout.flush()
-            print("\n[setup] Download complete.")
+                        if pct != last_pct:
+                            last_pct = pct
+                            sys.stdout.write(
+                                f"\r[setup] {pct}% ({downloaded:,} / {total:,} bytes)"
+                            )
+                            sys.stdout.flush()
+        if total and downloaded != total:
+            raise RuntimeError(
+                f"Download incomplete: got {downloaded:,} of {total:,} bytes."
+            )
+        part.replace(dest)
+        print("\n[setup] Download complete.")
     except urllib.error.HTTPError as e:
+        part.unlink(missing_ok=True)
         if e.code == 404:
             raise RuntimeError(
                 f"Asset not found (404) at:\n  {url}\n"
                 f"Verify the release tag and asset name are correct."
             ) from e
+        raise
+    except BaseException:
+        part.unlink(missing_ok=True)
         raise
 
 
@@ -337,80 +376,31 @@ def get_browser_path(
     return exe.resolve()
 
 
-if __name__ == "__main__":
-    from setuptools import setup, find_packages
-    from setuptools.command.install import install
-    from setuptools.command.develop import develop
+def main(argv: list[str] | None = None) -> None:
+    """Command line entry point: download the Camoufox browser bundle."""
+    import argparse
 
-    class InstallCommand(install):
-        """Runs the browser fetch before the normal install."""
-
-        def run(self):
-            fetch_browser()
-            super().run()
-
-    class DevelopCommand(develop):
-        """Runs the browser fetch before the normal develop (editable install)."""
-
-        def run(self):
-            fetch_browser()
-            super().run()
-
-    def _cli_main():
-        import argparse
-
-        parser = argparse.ArgumentParser(description="Camoufox browser setup helper")
-        parser.add_argument(
-            "--dist-dir",
-            "-d",
-            default=str(DIST_DIR),
-            help=f"Directory to install the browser (default: {DIST_DIR})",
-        )
-        args = parser.parse_args()
-
-        dist = fetch_browser(Path(args.dist_dir))
-        print(f"\n[setup] Camoufox is ready at: {dist}")
-
-        exe = find_executable(dist)
-        if exe:
-            print(f"""
-# Usage in Python:
-from camoufox.sync_api import Camoufox
-
-with Camoufox(executable_path=r"{exe}") as browser:
-    page = browser.new_page()
-    page.goto("https://github.com/SystemCallW/Soylock")
-""")
-
-    # If invoked with arguments that look like a fetch command, run CLI.
-    # Otherwise let setuptools handle it (pip install, etc.).
-    if len(sys.argv) > 1 and sys.argv[1] in ("fetch", "--dist-dir", "-d"):
-        _cli_main()
-        sys.exit(0)
-
-    setup(
-        name="soylock",
-        version="0.19.1",
-        description="",
-        author="SystemCallW",
-        packages=find_packages(),
-        python_requires=">=3.9",
-        install_requires=[
-            "bs4",
-            "pandas",
-            "colorama",
-            "requests",
-            "tls_client",
-            "playwright==1.57.0",
-            "cloverlabs-camoufox==0.6.0",
-        ],
-        cmdclass={
-            "install": InstallCommand,
-            "develop": DevelopCommand,
-        },
-        entry_points={
-            "console_scripts": [
-                "camoufox-fetch=setup:main",
-            ],
-        },
+    parser = argparse.ArgumentParser(
+        prog="soylock-setup", description="Camoufox browser setup helper"
     )
+    parser.add_argument(
+        "command",
+        nargs="?",
+        choices=["fetch"],
+        default="fetch",
+        help="Download the browser if it is missing (default).",
+    )
+    parser.add_argument(
+        "--dist-dir",
+        "-d",
+        default=str(DIST_DIR),
+        help=f"Directory to install the browser (default: {DIST_DIR})",
+    )
+    args = parser.parse_args(argv)
+
+    dist = fetch_browser(Path(args.dist_dir))
+    print(f"\n[setup] Camoufox is ready at: {dist}")
+
+
+if __name__ == "__main__":
+    main()

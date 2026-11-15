@@ -69,6 +69,10 @@ class BrowserEngine:
             "i_know_what_im_doing": True,
             "config": {"forceScopeAccess": True},
             "disable_coop": True,
+            # Skip camoufox's host-GPU probe. It launches stock Playwright against
+            # this build and crashes (Browser.setDefaultViewport) whenever the random
+            # fingerprint happens to match the host OS.
+            "canvas_noise": True,
             "executable_path": get_browser_path(auto_fetch=True),
             "ff_version": 150,
             "firefox_user_prefs": {
