@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "shr3x", email = "194409493+shr3x@users.noreply.github.com" }
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.14"
 dependencies = [
     "beautifulsoup4>=4.15.0",
     "camoufox>=0.5.9",
